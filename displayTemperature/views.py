@@ -10,7 +10,9 @@ def index(request):
         print("Subscribed: "+str(mid)+" "+str(granted_qos))
  
     def on_message(client, userdata, msg):
-        print(msg.topic+" "+str(msg.qos)+" "+str(msg.payload))    
+        message = msg.topic+" "+str(msg.qos)+" "+str(msg.payload)
+        return HttpResponse("test")  
+        print(message) 
  
     client = paho.Client()
     client.on_connect = on_connect
@@ -19,5 +21,4 @@ def index(request):
     client.connect("broker.mqttdashboard.com", 1883)
     client.subscribe("testtopic/200", qos=1)
  
-    client.loop_forever()
-    return HttpResponse("Test")
+    client.loop_start()
