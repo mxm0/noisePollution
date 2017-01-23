@@ -11,8 +11,9 @@ def index(request):
  
     def on_message(client, userdata, msg):
         message = msg.topic+" "+str(msg.qos)+" "+str(msg.payload)
-        return HttpResponse("test")  
-        print(message) 
+        print(message)
+        client.loop_start()
+        return HttpResponse(message)   
  
     client = paho.Client()
     client.on_connect = on_connect
@@ -21,4 +22,4 @@ def index(request):
     client.connect("broker.mqttdashboard.com", 1883)
     client.subscribe("testtopic/200", qos=1)
  
-    client.loop_start()
+    client.loop_forever()
