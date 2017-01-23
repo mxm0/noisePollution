@@ -39,6 +39,10 @@ INSTALLED_APPS = [
     # http://whitenoise.evans.io/en/stable/django.html#using-whitenoise-in-development
     'whitenoise.runserver_nostatic',
     'django.contrib.staticfiles',
+    'django_mqtt',
+    'django_mqtt.mosquitto.auth_plugin',
+    'django_mqtt.publisher',
+    'django_mqtt.server'
 ]
 
 MIDDLEWARE_CLASSES = [
