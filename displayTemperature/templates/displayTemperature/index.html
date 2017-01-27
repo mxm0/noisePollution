@@ -1,0 +1,31 @@
+{% if messages %}
+    <ul id="appendMessages">
+    {% for message in messages %}
+        <li>{{ message.message_text }}, {{ message.rcv_date }}</li>
+    {% endfor %}
+	</ul>
+{% else %}
+    <p>No messages are available.</p>
+{% endif %}
+
+<script type="text/javascript" src="/static/js/jquery.js"></script>
+<script>
+$(document).ready(function() {
+	var last_id = "{{id}}";
+	$.ajaxSetup({
+	  data: {csrfmiddlewaretoken: '{{ csrf_token }}' },
+	});
+  setInterval(function(){
+			$.ajax({
+        type: "POST",
+        url: "/displayTemperature/checkMessages/",
+				data: {"id" : last_id},
+				success: function(response){
+			    $('#appendMessages').append(response)
+					last_id = id
+				}
+			});
+		}, 3000);
+		});	 
+</script>
+		

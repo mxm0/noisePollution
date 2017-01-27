@@ -1,25 +1,30 @@
 from django.http import HttpResponse
+from django.template import loader
 import paho.mqtt.client as paho
-
+import time
+from django.shortcuts import render, redirect
+from displayTemperature.models import Message
+from django.utils import timezone
+from datetime import datetime, timedelta
+from django.core import serializers
 
 def index(request):
-    def on_connect(client, userdata, flags, rc):
-        print("CONNACK received with code %d." % (rc))
-    
-    def on_subscribe(client, userdata, mid, granted_qos):
-        print("Subscribed: "+str(mid)+" "+str(granted_qos))
- 
-    def on_message(client, userdata, msg):
-        message = msg.topic+" "+str(msg.qos)+" "+str(msg.payload)
-        print(message)
-        client.loop_start()
-        return HttpResponse(message)   
- 
-    client = paho.Client()
-    client.on_connect = on_connect
-    client.on_subscribe = on_subscribe
-    client.on_message = on_message
-    client.connect("broker.mqttdashboard.com", 1883)
-    client.subscribe("testtopic/200", qos=1)
- 
-    client.loop_forever()
+    messages = Message.objects.all().order_by('rcv_date')
+    template = loader.get_template('displayTemperature/index.html')
+    context = {
+        'messages': messages,
+        'id' : messages.reverse()[0].id
+    }
+    return HttpResponse(template.render(context, request))
+
+def check_messages(request):
+    last_id = request.POST['id']
+    messages = Message.objects.filter(id__gt = last_id).order_by('rcv_date')
+    if messages.exists():
+        template = loader.get_template('displayTemperature/new_messages.html')
+        context = {
+            'messages': messages,
+            'id' : messages.reverse()[0].id
+        }
+        return HttpResponse(template.render(context, request))
+    return HttpResponse(status=204)

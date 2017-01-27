@@ -1,0 +1,6 @@
+{% for message in messages %}
+    <li>{{ message.message_text }}, {{ message.rcv_date }}</li>
+{% endfor %}
+<script>
+ var id = "{{id}}"
+</script>
