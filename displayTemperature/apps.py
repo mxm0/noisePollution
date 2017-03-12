@@ -2,6 +2,8 @@ from __future__ import unicode_literals
 import paho.mqtt.client as paho
 from django.apps import AppConfig
 from django.utils import timezone
+import json
+import base64
 
 
 class DisplaytemperatureConfig(AppConfig):
@@ -10,24 +12,28 @@ class DisplaytemperatureConfig(AppConfig):
     def ready(self):
         from displayTemperature.models import Message
         def on_connect(client, userdata, flags, rc):
-            print("dio can")
             print("CONNACK received with code %d." % (rc))
-            client.subscribe("lora/message", qos=1)
+            client.subscribe("/lora/008000000000be50/message", qos=1)
 
         def on_subscribe(client, userdata, mid, granted_qos):
             print("Subscribed: "+str(mid)+" "+str(granted_qos))
 
         def on_message(client, userdata, msg):
-            message = Message(message_text = str(msg.payload), 
+            response = json.loads(msg.payload)
+            decoded_data = base64.b64decode(response['data']).decode("utf-8")
+            message = Message(message_text = decoded_data, 
                               rcv_date=timezone.now())
             message.save()
-            print(msg.topic+" "+str(msg.qos)+" "+str(msg.payload))
+            print("decoded data: " + str(decoded_data))
+            
+        def on_log(mqttc, obj, level, string):
+            print(string)
         
-        client = paho.Client()
-        client.username_pw_set("MassimoInnocentini", "Interject47small!Boxtrailer")
+        client = paho.Client(transport="websockets")
+        client.username_pw_set(username="MassimoInnocentini", password="Interject47small!Boxtrailer")
         client.on_connect = on_connect
         client.on_subscribe = on_subscribe
         client.on_message = on_message
+        client.on_log = on_log
         client.connect("lora-eu.iot-x.com", 3000, 60)
         client.loop_start()
-        print("prova")

@@ -1,6 +1,18 @@
+<script type="text/javascript" src="/static/js/vis.js"></script>
+
 {% for message in messages %}
-    <li>{{ message.message_text }}, {{ message.rcv_date }}</li>
+    <li>{{ message.message_value }}, {{ message.rcv_date }}</li>
 {% endfor %}
+
 <script>
- var id = "{{id}}"
+  //var new_dataset = new vis.DataSet();
+  var id = "{{id_n}}";
+  //var messageList = "{{messages}}";
+  //window.alert(messageList[0].message_value);
+  /*for(var i = 0; i < 2; i++){
+      new_dataset.add({
+        x: messageList[i].rcv_date,
+        y: messageList[i].message_value
+      });
+  }*/
 </script>

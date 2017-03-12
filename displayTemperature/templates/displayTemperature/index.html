@@ -1,15 +1,65 @@
-{% if messages %}
-    <ul id="appendMessages">
-    {% for message in messages %}
-        <li>{{ message.message_text }}, {{ message.rcv_date }}</li>
-    {% endfor %}
-	</ul>
-{% else %}
-    <p>No messages are available.</p>
-{% endif %}
+<head>
+	<script>(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)})(window,document,'script','//www.google-analytics.com/analytics.js','ga');ga('create', 'UA-61231638-1', 'auto');ga('send', 'pageview');</script>
+	<script type="text/javascript" src="/static/js/jquery.js"></script>
+	<script type="text/javascript" src="/static/js/vis.js"></script>
+	<link href="/static/css/vis-timeline-graph2d.min.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+	
+	<div id="visualization"></div>
+		
+<script type="text/javascript">
+  var DELAY = 3000; // delay in ms to add new data points
 
-<script type="text/javascript" src="/static/js/jquery.js"></script>
-<script>
+  //var strategy = document.getElementById('strategy');
+
+  // create a graph2d with an (currently empty) dataset
+  var container = document.getElementById('visualization');
+  var dataset = new vis.DataSet();
+  var messages = JSON.parse('{{messages | safe}}');
+
+  for(var i = 0; i < messages.length; i++){
+      	dataset.add({
+			x: messages[i].fields['rcv_date'],
+			y: messages[i].fields['message_value']
+      	});
+			console.log(messages[i].fields['message_value']);
+  }
+
+  var options = {
+    start: vis.moment().add(-60, 'seconds'), // changed so its faster
+    end: vis.moment(),
+    dataAxis: {
+      left: {
+        range: {
+			min:0, max: 100
+        }
+      }
+    },
+    drawPoints: {
+      style: 'circle' // square, circle
+    },
+    shaded: {
+      orientation: 'bottom' // top, bottom
+    }
+  };
+  
+  var graph2d = new vis.Graph2d(container, dataset, options);
+
+  function renderStep() {
+    // move the window (you can think of different strategies).
+    var now = vis.moment();
+    var range = graph2d.getWindow();
+    var interval = range.end - range.start;
+    // move the window 90% to the left when now is larger than the end of the window
+    if (now > range.end) {
+       graph2d.setWindow(now - 0.1 * interval, now + 0.9 * interval);
+    }
+  }
+
+
+// Fetch new data point and add it to the dataset
+
 $(document).ready(function() {
 	var last_id = "{{id}}";
 	$.ajaxSetup({
@@ -21,11 +71,21 @@ $(document).ready(function() {
         url: "/displayTemperature/checkMessages/",
 				data: {"id" : last_id},
 				success: function(response){
-			    $('#appendMessages').append(response)
-					last_id = id
+					var json = JSON.parse(response);
+					var results = JSON.parse(json.results);
+					console.dir(results[0].model);
+					last_id = json.id;
+				    for(var i = 0; i < results.length; i++){
+				        	dataset.add({
+							  x: results[i].fields['rcv_date'],
+				          	  y: results[i].fields['message_value']
+				        	});
+				    }
 				}
 			});
+			renderStep();
 		}, 3000);
 		});	 
 </script>
-		
+  
+</body>
