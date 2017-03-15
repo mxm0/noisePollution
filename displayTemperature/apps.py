@@ -10,7 +10,7 @@ class DisplaytemperatureConfig(AppConfig):
     name = 'displayTemperature'
     verbose_name = "Displaying Temperature"
     def ready(self):
-        from displayTemperature.models import Message
+        from displayTemperature.models import Message, Device
         def on_connect(client, userdata, flags, rc):
             print("CONNACK received with code %d." % (rc))
             client.subscribe("/lora/008000000000be50/message", qos=1)
@@ -21,9 +21,11 @@ class DisplaytemperatureConfig(AppConfig):
         def on_message(client, userdata, msg):
             response = json.loads(msg.payload)
             decoded_data = base64.b64decode(response['data']).decode("utf-8")
-            dev_eui = response['dev_eui']
+            device = Device.objects.filter(dev_eui = response['dev_eui'])
+            print(device)
             message = Message(message_text = decoded_data, 
-                              rcv_date=timezone.now())
+                              rcv_date=timezone.now(),
+                              device=device)
             message.save()
             print("decoded data: " + str(decoded_data))
             
