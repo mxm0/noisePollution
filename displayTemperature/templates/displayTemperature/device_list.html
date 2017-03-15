@@ -1,5 +1,12 @@
+{% extends 'displayTemperature/base.html' %}
+
 {% block content %}
+	<h1>Device List</h1>
   {% for device in devices %}
-    <h2>{{ device.dev_eui }}</h2>
+  	<div class="row">
+  		<ul>
+		  <li><a href="{% url 'graph' deveui=device.dev_eui %}">{{ device.dev_eui }}</a></li>
+  		</ul>
+  	</div>
   {% endfor %}
 {% endblock %}

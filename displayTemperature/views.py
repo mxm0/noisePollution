@@ -11,8 +11,12 @@ import json
 from .forms import AddDeviceForm
 
 def index(request):
+    return render(request, 'displayTemperature/index.html')
+    
+def graph(request, deveui):
+    print(deveui)
     messages = Message.objects.all().order_by('rcv_date')
-    template = loader.get_template('displayTemperature/index.html')
+    template = loader.get_template('displayTemperature/graph.html')
     if messages.exists():
         data = serializers.serialize("json", messages, fields=('average', 'rcv_date'))
         context = {
