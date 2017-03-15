@@ -32,3 +32,6 @@ def check_messages(request):
         d['id'] = messages.reverse()[0].id
         return JsonResponse(d)
     return HttpResponseBadRequest()
+
+def add_device(request):
+    
