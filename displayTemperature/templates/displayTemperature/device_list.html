@@ -1,0 +1,5 @@
+{% block content %}
+  {% for device in devices %}
+    <h2>{{ device.dev_eui }}</h2>
+  {% endfor %}
+{% endblock %}

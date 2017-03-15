@@ -21,6 +21,7 @@ class DisplaytemperatureConfig(AppConfig):
         def on_message(client, userdata, msg):
             response = json.loads(msg.payload)
             decoded_data = base64.b64decode(response['data']).decode("utf-8")
+            dev_eui = response['dev_eui']
             message = Message(message_text = decoded_data, 
                               rcv_date=timezone.now())
             message.save()
