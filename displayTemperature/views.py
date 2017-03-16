@@ -81,5 +81,18 @@ def ajax_device_search(request):
         return render(request, 'displayTemperature/device_search.html', {'form': form})
         
 def edit_device(request, deveui):
-    return HttpResponse(deveui)
+    if request.method== 'POST':
+        address = request.POST.get('address')
+        device = Device.objects.filter(dev_eui=deveui)
+        if device.exists():
+            api_key = "AIzaSyB0L99kRyFar3t6ecNlkyYeC7Ky14udF6o"
+            gmaps = Client(api_key)
+            geocode_result = gmaps.geocode(address)
+            latitude = geocode_result[0]['geometry']['location']['lat']
+            longitude = geocode_result[0]['geometry']['location']['lng']
+            Device.objects.filter(dev_eui=deveui).update(address=address, latitude=latitude, longitude=longitude)
+            return redirect('list_device')
+    else:
+        form = EditDeviceForm()
+        return render(request, 'displayTemperature/edit_device.html', {'form': form})
     

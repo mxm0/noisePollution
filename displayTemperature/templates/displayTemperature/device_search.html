@@ -2,7 +2,7 @@
 
 {% block content %}
 	<div>
-    	<h1>Edit Device</h1>
+    	<h1>Search Device</h1>
 	    <form method="POST" class="post-form" id="post-form">{% csrf_token %}
 	        {{ form.as_p }}
 	        <button type="submit" class="save btn btn-default">Search</button>
@@ -35,7 +35,7 @@
 				for(var i = 0; i < data.length; i++){
 					var url = "{% url 'edit_device' deveui=1 %}" . replace("1", data[i].fields['dev_eui']);
 					console.log(url);
-					$("#results").append("<li><strong><a href='"+url+"'>"+ data[i].fields['dev_eui']+"</a></strong>,"+data[i].fields['address']+"</li>");
+					$("#results").append("<li><strong><a href='"+url+"'>"+data[i].fields['dev_eui']+"</a></strong>,"+data[i].fields['address']+"</li>");
 				}
 			    console.log("success"); // another sanity check
 	        }

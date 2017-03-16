@@ -1,5 +1,9 @@
 {% extends 'displayTemperature/base.html' %}
 
 {% block content %}
-	
+	<h1>Edit Device Address</h1>
+    <form method="POST" class="post-form" id="post-form">{% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="save btn btn-default">Edit</button>
+    </form>
 {% endblock %}
