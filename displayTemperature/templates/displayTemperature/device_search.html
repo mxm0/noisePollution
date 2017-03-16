@@ -1,0 +1,45 @@
+{% extends 'displayTemperature/base.html' %}
+
+{% block content %}
+	<div>
+    	<h1>Edit Device</h1>
+	    <form method="POST" class="post-form" id="post-form">{% csrf_token %}
+	        {{ form.as_p }}
+	        <button type="submit" class="save btn btn-default">Search</button>
+	    </form>
+		<div class="margin">
+			<div>
+		  		<ul id="results">
+		  		</ul>
+			</div>
+		</div>
+	</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+	// Submit post on submit
+	$('#post-form').submit(function(event){
+	    event.preventDefault();
+		$.ajaxSetup({
+		  data: {csrfmiddlewaretoken: '{{ csrf_token }}' },
+		});
+	    $.ajax({
+	        url : "/displayTemperature/deviceSearch/", // the endpoint
+	        type : "POST", // http method
+	        data : { dev_eui : $('#id_dev_eui').val(), address : $('#id_address').val() },// data sent with the post request
+
+	        // handle a successful response
+	        success : function(json) {
+				var data = JSON.parse(json.results);
+				for(var i = 0; i < data.length; i++){
+					var url = "{% url 'edit_device' deveui=1 %}" . replace("1", data[i].fields['dev_eui']);
+					console.log(url);
+					$("#results").append("<li><strong><a href='"+url+"'>"+ data[i].fields['dev_eui']+"</a></strong>,"+data[i].fields['address']+"</li>");
+				}
+			    console.log("success"); // another sanity check
+	        }
+	    });
+	});
+</script>
+{% endblock %}

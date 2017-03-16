@@ -7,8 +7,8 @@ import base64
 
 
 class DisplaytemperatureConfig(AppConfig):
-    name = 'displayTemperature'
-    verbose_name = "Displaying Temperature"
+    name='displayTemperature'
+    verbose_name="Displaying Temperature"
     def ready(self):
         from displayTemperature.models import Message, Device
         def on_connect(client, userdata, flags, rc):
@@ -21,22 +21,24 @@ class DisplaytemperatureConfig(AppConfig):
         def on_message(client, userdata, msg):
             response = json.loads(msg.payload)
             decoded_data = base64.b64decode(response['data']).decode("utf-8")
-            device = Device.objects.filter(dev_eui = response['dev_eui'])
-            print(device)
-            message = Message(message_text = decoded_data, 
-                              rcv_date=timezone.now(),
-                              device=device)
-            message.save()
+            device = Device.objects.filter(dev_eui=response['dev_eui'])
+            if device.exists():
+                print(device)
+                message = Message(message_text=decoded_data, 
+                                  rcv_date=timezone.now(),
+                                  device=device)
+                message.save()
             print("decoded data: " + str(decoded_data))
             
         def on_log(mqttc, obj, level, string):
             print(string)
         
-        client = paho.Client(transport="websockets")
+        client=paho.Client(transport="websockets")
         client.username_pw_set(username="MassimoInnocentini", password="Interject47small!Boxtrailer")
-        client.on_connect = on_connect
-        client.on_subscribe = on_subscribe
-        client.on_message = on_message
-        client.on_log = on_log
+        client.on_connect=on_connect
+        client.on_subscribe=on_subscribe
+        client.on_message=on_message
+        client.on_log=on_log
         client.connect("lora-eu.iot-x.com", 3000, 60)
         client.loop_start()
+

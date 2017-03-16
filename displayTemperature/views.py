@@ -4,11 +4,13 @@ import paho.mqtt.client as paho
 import time
 from django.shortcuts import render, redirect
 from displayTemperature.models import Message, Device
+from django.db.models import Q
 from django.utils import timezone
 from datetime import datetime, timedelta
 from django.core import serializers
 import json
-from .forms import AddDeviceForm
+from .forms import AddDeviceForm, EditDeviceForm, SearchDeviceForm
+from googlemaps import Client
 
 def index(request):
     return render(request, 'displayTemperature/index.html')
@@ -51,10 +53,33 @@ def add_device(request):
     if request.method == "POST":
         form = AddDeviceForm(request.POST)
         if form.is_valid():
+            api_key = "AIzaSyB0L99kRyFar3t6ecNlkyYeC7Ky14udF6o"
+            gmaps = Client(api_key)
             device = form.save(commit=False)
+            geocode_result = gmaps.geocode(device.address)
+            device.latitude = geocode_result[0]['geometry']['location']['lat']
+            device.longitude = geocode_result[0]['geometry']['location']['lng']
             device.save()
             return redirect('list_device')
     else:
         form = AddDeviceForm()
     return render(request, 'displayTemperature/new_device.html', {'form': form})
+
+def ajax_device_search(request):
+    if request.method== 'POST':
+        dev_eui = request.POST.get('dev_eui')
+        address = request.POST.get('address')
+        device = Device(dev_eui=dev_eui, address=address)         
+        results = Device.objects.filter(Q(dev_eui__contains = device) | Q(address__contains = address))
+        if results.exists():
+            data = serializers.serialize("json", results, fields=('dev_eui', 'address'))
+            d = {}
+            d['results'] = data
+            return JsonResponse(d)
+    else:
+        form = SearchDeviceForm()
+        return render(request, 'displayTemperature/device_search.html', {'form': form})
+        
+def edit_device(request, deveui):
+    return HttpResponse(deveui)
     
