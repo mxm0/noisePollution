@@ -22,26 +22,35 @@ def about(request, id=None):
     return render(request,'displayTemperature/about.html')
     
 def graph(request, deveui):
-    print(deveui)
-    messages = Message.objects.all().order_by('rcv_date')
+    device = Device.objects.filter(dev_eui=deveui)
+    messages = Message.objects.filter(device=device).order_by('rcv_date')
     template = loader.get_template('displayTemperature/graph.html')
     if messages.exists():
         data = serializers.serialize("json", messages, fields=('average', 'rcv_date'))
         context = {
             'messages': data,
-            'id' : messages.reverse()[0].id
+            'id' : messages.reverse()[0].id,
+            'deveui' : deveui,
+            'highest' : device[0].highest,
+            'lowest' : device[0].lowest,
+            'average' : messages.reverse()[0].average
         }
         return HttpResponse(template.render(context, request))
     return HttpResponseBadRequest()
 
 def check_messages(request):
     last_id = request.POST['id']
-    messages = Message.objects.filter(id__gt = last_id).order_by('rcv_date')
+    deveui = request.POST['deveui']
+    device = Device.objects.filter(dev_eui=deveui)
+    messages = Message.objects.filter(Q(id__gt = last_id) & Q(device=device)).order_by('rcv_date')
     if messages.exists():
         data = serializers.serialize("json", messages, fields=('average', 'rcv_date'))
         d = {}
         d['results'] = data
         d['id'] = messages.reverse()[0].id
+        d['highest'] = device[0].highest
+        d['lowest'] =  device[0].lowest
+        d['last_avg'] = messages.reverse()[0].average
         return JsonResponse(d)
     return HttpResponseBadRequest()
 

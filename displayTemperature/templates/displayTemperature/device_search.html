@@ -44,7 +44,6 @@
 				$("#results").html("");
 				for(var i = 0; i < data.length; i++){
 					var url = "{% url 'edit_device' deveui=1 %}" . replace("1", data[i].fields['dev_eui']);
-					console.log(url);
 					$("#results").append("<tr>" +
 										 "<td><strong>" + data[i].fields['dev_eui'] + "</strong></td>" +
 						    			 "<td>" + data[i].fields['address'] + "</td>" +

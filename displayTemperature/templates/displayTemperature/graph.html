@@ -1,25 +1,32 @@
 {% extends 'displayTemperature/base.html' %}
 
 {% block content %}
-	
 	<div id="visualization"></div>
-		
+	<div id="values">
+		<strong>Highest:  </strong> <p id="max" style="display:inline"></p>dB <strong>Average:  </strong> <p id="avg" style="display:inline"></p>dB <strong>Lowest:  </strong> <p id="lwt" style="display:inline"></p>dB
+	</div>
+{% endblock %}
+
+{% block extra_js %}
 <script type="text/javascript">
   var DELAY = 3000; // delay in ms to add new data points
 
-  //var strategy = document.getElementById('strategy');
-
-  // create a graph2d with an (currently empty) dataset
+  // create a graph2d with a (currently empty) dataset
   var container = document.getElementById('visualization');
   var dataset = new vis.DataSet();
   var messages = JSON.parse('{{messages | safe}}');
 
+  // update html
+  $("#max").html("{{highest}}");
+  $("#avg").html("{{average}}");
+  $("#lwt").html("{{lowest}}");
+
   for(var i = 0; i < messages.length; i++){
       	dataset.add({
 			x: messages[i].fields['rcv_date'],
-			y: messages[i].fields['message_value']
+			y: messages[i].fields['average']
       	});
-			console.log(messages[i].fields['message_value']);
+			console.log(messages[i].fields['average']);
   }
 
   var options = {
@@ -53,11 +60,10 @@
     }
   }
 
-
 // Fetch new data point and add it to the dataset
-
 $(document).ready(function() {
 	var last_id = "{{id}}";
+	var deveui = "{{deveui}}";
 	$.ajaxSetup({
 	  data: {csrfmiddlewaretoken: '{{ csrf_token }}' },
 	});
@@ -65,16 +71,21 @@ $(document).ready(function() {
 			$.ajax({
         type: "POST",
         url: "/displayTemperature/checkMessages/",
-				data: {"id" : last_id},
+				data: {"id" : last_id, "deveui" : deveui},
 				success: function(response){
-					var json = JSON.parse(response);
-					var results = JSON.parse(json.results);
-					console.dir(results[0].model);
-					last_id = json.id;
+					var results = JSON.parse(response.results);
+					last_id = response.id;
+					highest = response.highest;
+					lowest = response.lowest;
+					average = response.last_average;
+					// update html
+					$("#max").html(highest);
+					$("#avg").html(average);
+					$("#lwt").html(lowest);
 				    for(var i = 0; i < results.length; i++){
 				        	dataset.add({
 							  x: results[i].fields['rcv_date'],
-				          	  y: results[i].fields['message_value']
+				          	  y: results[i].fields['average']
 				        	});
 				    }
 				}
@@ -83,5 +94,4 @@ $(document).ready(function() {
 		}, 3000);
 		});	 
 </script>
-  
-{% endblock %}
+{% endblock%}
