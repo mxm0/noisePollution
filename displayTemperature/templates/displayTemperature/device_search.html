@@ -5,12 +5,21 @@
     	<h1>Search Device</h1>
 	    <form method="POST" class="post-form" id="post-form">{% csrf_token %}
 	        {{ form.as_p }}
-	        <button type="submit" class="save btn btn-default">Search</button>
+	        <button type="submit" class="save btn btn-primary">Search</button>
 	    </form>
 		<div class="margin">
 			<div>
-		  		<ul id="results">
-		  		</ul>
+				<table class="table table-condensed">
+					<thead>
+					  <tr>
+					    <th scope="row">Dev EUI</th>
+					    <th>Location</th>
+						<th>Edit</th>
+					  </tr>
+					</thead>
+					<tbody id="results">
+				  </tbody>
+				</table>
 			</div>
 		</div>
 	</div>
@@ -32,10 +41,15 @@
 	        // handle a successful response
 	        success : function(json) {
 				var data = JSON.parse(json.results);
+				$("#results").html("");
 				for(var i = 0; i < data.length; i++){
 					var url = "{% url 'edit_device' deveui=1 %}" . replace("1", data[i].fields['dev_eui']);
 					console.log(url);
-					$("#results").append("<li><strong><a href='"+url+"'>"+data[i].fields['dev_eui']+"</a></strong>,"+data[i].fields['address']+"</li>");
+					$("#results").append("<tr>" +
+										 "<td><strong>" + data[i].fields['dev_eui'] + "</strong></td>" +
+						    			 "<td>" + data[i].fields['address'] + "</td>" +
+										 "<td><a href='" + url + "'class='btn-sm btn-primary'>Edit</a></td>" +
+						  				 "</tr>");
 				}
 			    console.log("success"); // another sanity check
 	        }

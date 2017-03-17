@@ -15,18 +15,18 @@
 		<nav class="navbar navbar-inverse navbar-fixed-top">
 		  <div class="container-fluid">
 		    <ul class="nav navbar-nav">
-		      <li class="active"><a href="/displayTemperature/">Home</a></li>
+		      <li class="active"><a href="{% url 'index' %}">Home</a></li>
 	          <li class="dropdown">
 	            <a href="#" class="dropdown-toggle" data-toggle="dropdown">Devices 
 				<span class="caret"></span></a>
 	            <ul class="dropdown-menu">
-	              <li><a href="/displayTemperature/deviceList">Device List</a></li>
-	              <li><a href="/displayTemperature/addDevice">Add Device</a></li>
-				  <li><a href="/displayTemperature/deviceSearch">Edit Device</a></li>
+	              <li><a href="{% url 'list_device' %}">Device List</a></li>
+	              <li><a href="{% url 'add_device' %}">Add Device</a></li>
+				  <li><a href="{% url 'device_search' %}">Edit Device</a></li>
 	            </ul>
 	          </li>
-		      <li><a href="#">Map</a></li>
-		      <li><a href="#">About</a></li>
+		      <li><a href="{% url 'map' %}">Map</a></li>
+		      <li><a href="{% url 'about' %}">About</a></li>
 		    </ul>
 		  </div>
 		</nav>

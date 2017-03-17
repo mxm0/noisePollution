@@ -9,7 +9,9 @@ class AddDeviceForm(forms.ModelForm):
         fields = ('dev_eui', 'address')
 
 class SearchDeviceForm(forms.ModelForm):
-
+    
+    dev_eui = forms.CharField(required=False)
+    
     class Meta:
         model = Device
         fields = ('dev_eui', 'address')

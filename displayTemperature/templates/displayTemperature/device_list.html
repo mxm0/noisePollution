@@ -2,11 +2,22 @@
 
 {% block content %}
 	<h1>Device List</h1>
-  {% for device in devices %}
-  	<div class="row">
-  		<ul>
-		  <li><a href="{% url 'graph' deveui=device.dev_eui %}">{{ device.dev_eui }}</a>, {{ device.address }}</li>
-  		</ul>
-  	</div>
-  {% endfor %}
+		<table class="table table-condensed">
+			<thead>
+			  <tr>
+			    <th scope="row">Dev EUI</th>
+			    <th>Location</th>
+				<th>Graph</th>
+			  </tr>
+			</thead>
+			<tbody>
+			  {% for device in devices %}
+				  <tr>
+				    <td><strong>{{ device.dev_eui }}</strong></td>
+				    <td>{{ device.address }}</td>
+					<td><a href="{% url 'graph' deveui=device.dev_eui %}" class="btn-sm btn-primary">View</a></td>
+				  </tr>
+			  {% endfor %}
+		  </tbody>
+		</table>
 {% endblock %}

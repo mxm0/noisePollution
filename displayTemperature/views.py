@@ -15,6 +15,12 @@ from googlemaps import Client
 def index(request):
     return render(request, 'displayTemperature/index.html')
     
+def map(request, id=None):
+    return render(request, 'displayTemperature/map.html')
+    
+def about(request, id=None):
+    return render(request,'displayTemperature/about.html')
+    
 def graph(request, deveui):
     print(deveui)
     messages = Message.objects.all().order_by('rcv_date')
