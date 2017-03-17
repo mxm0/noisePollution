@@ -20,13 +20,18 @@ class DisplaytemperatureConfig(AppConfig):
 
         def on_message(client, userdata, msg):
             response = json.loads(msg.payload)
-            decoded_data = base64.b64decode(response['data']).decode("utf-8")
+            decoded_data = base64.b64decode(response['data']).decode("utf-8").split("-")
+            highest = decoded_data[0]
+            average = decoded_data[1]
+            lowest = decoded_data[2]
             device = Device.objects.filter(dev_eui=response['dev_eui'])
             if device.exists():
-                print(device)
                 message = Message(message_text=decoded_data, 
                                   rcv_date=timezone.now(),
                                   device=device)
+                device.highest = highest
+                device.lowest = lowest
+                device.save()
                 message.save()
             print("decoded data: " + str(decoded_data))
             

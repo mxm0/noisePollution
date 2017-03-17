@@ -2,7 +2,7 @@
 
 {% block content %}
 	<div id="visualization"></div>
-	<div id="values">
+	<div id="values" style="margin:20px">
 		<strong>Highest:  </strong> <p id="max" style="display:inline"></p>dB <strong>Average:  </strong> <p id="avg" style="display:inline"></p>dB <strong>Lowest:  </strong> <p id="lwt" style="display:inline"></p>dB
 	</div>
 {% endblock %}
@@ -26,7 +26,6 @@
 			x: messages[i].fields['rcv_date'],
 			y: messages[i].fields['average']
       	});
-			console.log(messages[i].fields['average']);
   }
 
   var options = {

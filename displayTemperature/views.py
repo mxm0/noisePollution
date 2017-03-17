@@ -11,6 +11,7 @@ from django.core import serializers
 import json
 from .forms import AddDeviceForm, EditDeviceForm, SearchDeviceForm
 from googlemaps import Client
+from django.contrib.auth.decorators import login_required
 
 def index(request):
     return render(request, 'displayTemperature/index.html')
@@ -63,7 +64,8 @@ def list_device(request):
         }
         return HttpResponse(template.render(context, request))
     return HttpResponseBadRequest()
-    
+
+@login_required    
 def add_device(request):
     if request.method == "POST":
         form = AddDeviceForm(request.POST)
@@ -80,6 +82,7 @@ def add_device(request):
         form = AddDeviceForm()
     return render(request, 'displayTemperature/new_device.html', {'form': form})
 
+@login_required
 def ajax_device_search(request):
     if request.method== 'POST':
         dev_eui = request.POST.get('dev_eui')
@@ -94,7 +97,8 @@ def ajax_device_search(request):
     else:
         form = SearchDeviceForm()
         return render(request, 'displayTemperature/device_search.html', {'form': form})
-        
+
+@login_required   
 def edit_device(request, deveui):
     if request.method== 'POST':
         address = request.POST.get('address')
@@ -110,4 +114,3 @@ def edit_device(request, deveui):
     else:
         form = EditDeviceForm()
         return render(request, 'displayTemperature/edit_device.html', {'form': form})
-    
