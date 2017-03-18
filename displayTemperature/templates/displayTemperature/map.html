@@ -1,0 +1,37 @@
+{% extends 'displayTemperature/base.html' %}
+
+{% block content %}
+    <div id="map"></div>
+{% endblock %}
+
+{% block extra_js %}
+    <script>
+      var map;
+      function initMap() {
+        map = new google.maps.Map(document.getElementById('map'), {
+          zoom: 14,
+          center: {lat: 55.861109, lng: -4.250206},
+          mapTypeId: 'satellite'
+        });
+		var data = JSON.parse('{{data | safe}}');
+		var heatMapData = [];
+		for(var key in data){
+			if (!data.hasOwnProperty(key)) continue;
+			var average = data[key].average['average__avg'];
+			var latitude = data[key].latitude;
+			var longitude = data[key].longitude;
+			heatMapData.push({location: new google.maps.LatLng(latitude, longitude), weight: average});
+		}
+        var heatmap = new google.maps.visualization.HeatmapLayer({
+          data: heatMapData,
+          map: map
+        });
+		heatmap.set('radius', 30);
+		heatmap.set('maxIntensity', 120);
+      }
+	  
+    </script>
+    <script async defer
+        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB0L99kRyFar3t6ecNlkyYeC7Ky14udF6o&libraries=visualization&callback=initMap">
+	</script>
+{% endblock %}

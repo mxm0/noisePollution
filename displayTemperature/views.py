@@ -4,7 +4,7 @@ import paho.mqtt.client as paho
 import time
 from django.shortcuts import render, redirect
 from displayTemperature.models import Message, Device
-from django.db.models import Q
+from django.db.models import Q,Avg
 from django.utils import timezone
 from datetime import datetime, timedelta
 from django.core import serializers
@@ -17,6 +17,17 @@ def index(request):
     return render(request, 'displayTemperature/index.html')
     
 def map(request, id=None):
+    devices = Device.objects.all()
+    if devices.exists():
+        data = {}
+        for device in devices:
+            tmp_data = {}
+            tmp_data['average'] = Message.objects.filter(device=device).aggregate(Avg('average'))
+            tmp_data['longitude'] = device.longitude
+            tmp_data['latitude'] = device.latitude
+            data[device.dev_eui] = tmp_data
+        results = json.dumps(data)
+        return render(request, 'displayTemperature/map.html', {'data' : results})
     return render(request, 'displayTemperature/map.html')
     
 def about(request, id=None):
