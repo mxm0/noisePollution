@@ -15,7 +15,7 @@ from django.contrib.auth.decorators import login_required
 
 def index(request):
     return render(request, 'displayTemperature/index.html')
-    
+
 def map(request, id=None):
     devices = Device.objects.all()
     if devices.exists():
@@ -38,7 +38,9 @@ def graph(request, deveui):
     messages = Message.objects.filter(device=device).order_by('rcv_date')
     template = loader.get_template('displayTemperature/graph.html')
     if messages.exists():
+        # make data as a json object, easier to access through javascript
         data = serializers.serialize("json", messages, fields=('average', 'rcv_date'))
+        # return id of the last value, it will be used to retrieve only new data
         context = {
             'messages': data,
             'id' : messages.reverse()[0].id,
@@ -51,6 +53,7 @@ def graph(request, deveui):
     return HttpResponseBadRequest()
 
 def check_messages(request):
+    # get all new data from a specific device
     last_id = request.POST['id']
     deveui = request.POST['deveui']
     device = Device.objects.filter(dev_eui=deveui)
@@ -80,6 +83,7 @@ def list_device(request):
 def add_device(request):
     if request.method == "POST":
         form = AddDeviceForm(request.POST)
+        # uso google maps api to reverse coordinates from address
         if form.is_valid():
             api_key = "AIzaSyB0L99kRyFar3t6ecNlkyYeC7Ky14udF6o"
             gmaps = Client(api_key)

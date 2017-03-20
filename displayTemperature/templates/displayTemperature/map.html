@@ -13,8 +13,10 @@
           center: {lat: 55.861109, lng: -4.250206},
           mapTypeId: 'satellite'
         });
+		// get values and coordinates to draw on the map
 		var data = JSON.parse('{{data | safe}}');
 		var heatMapData = [];
+		// add data to the heat map
 		for(var key in data){
 			if (!data.hasOwnProperty(key)) continue;
 			var average = data[key].average['average__avg'];
@@ -22,6 +24,7 @@
 			var longitude = data[key].longitude;
 			heatMapData.push({location: new google.maps.LatLng(latitude, longitude), weight: average});
 		}
+		// initialize map with values
         var heatmap = new google.maps.visualization.HeatmapLayer({
           data: heatMapData,
           map: map
