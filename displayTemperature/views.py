@@ -59,6 +59,7 @@ def check_messages(request):
     device = Device.objects.filter(dev_eui=deveui)
     messages = Message.objects.filter(Q(id__gt = last_id) & Q(device=device)).order_by('rcv_date')
     if messages.exists():
+        print(messages.reverse()[0].average)
         data = serializers.serialize("json", messages, fields=('average', 'rcv_date'))
         d = {}
         d['results'] = data
