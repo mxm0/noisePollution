@@ -1,96 +1,105 @@
 {% extends 'displayTemperature/base.html' %}
 
 {% block content %}
-	<div id="visualization"></div>
-	<div id="values" style="margin:20px">
-		<strong>Highest:  </strong> <p id="max" style="display:inline"></p>dB <strong>Average:  </strong> <p id="avg" style="display:inline"></p>dB <strong>Lowest:  </strong> <p id="lwt" style="display:inline"></p>dB
-	</div>
+	{% if context %}
+		<div id="info" style="margin-bottom:20px">
+			<strong>Device: </strong>{{deveui}},  <strong>Location: </strong>{{location}}
+		</div>
+			<div id="visualization"></div>
+		<div id="values" style="margin:20px">
+			<strong>Highest:  </strong> <p id="max" style="display:inline"></p>dB <strong>Average:  </strong> <p id="avg" style="display:inline"></p>dB <strong>Lowest:  </strong> <p id="lwt" style="display:inline"></p>dB
+		</div>
+	{% else %}
+		<strong> There is no data from this device. </strong>
+	{% endif %}
 {% endblock %}
 
 {% block extra_js %}
-<script type="text/javascript">
-  var DELAY = 3000; // delay in ms to add new data points
+	{% if context %}
+		<script type="text/javascript">
+		  var DELAY = 3000; // delay in ms to add new data points
 
-  // create a graph2d with a (currently empty) dataset
-  var container = document.getElementById('visualization');
-  var dataset = new vis.DataSet();
-  var messages = JSON.parse('{{messages | safe}}');
+		  // create a graph2d with a (currently empty) dataset
+		  var container = document.getElementById('visualization');
+		  var dataset = new vis.DataSet();
+		  var messages = JSON.parse('{{messages | safe}}');
 
-  // update html
-  $("#max").html("{{highest}}");
-  $("#avg").html("{{average}}");
-  $("#lwt").html("{{lowest}}");
+		  // update html
+		  $("#max").html("{{highest}}");
+		  $("#avg").html("{{average}}");
+		  $("#lwt").html("{{lowest}}");
 
-  for(var i = 0; i < messages.length; i++){
-      	dataset.add({
-			x: messages[i].fields['rcv_date'],
-			y: messages[i].fields['average']
-      	});
-  }
+		  for(var i = 0; i < messages.length; i++){
+		      	dataset.add({
+					x: messages[i].fields['rcv_date'],
+					y: messages[i].fields['average']
+		      	});
+		  }
 
-  var options = {
-    start: vis.moment().add(-60, 'seconds'), // changed so its faster
-    end: vis.moment(),
-    dataAxis: {
-      left: {
-        range: {
-			min:0, max: 100
-        }
-      }
-    },
-    drawPoints: {
-      style: 'circle' // square, circle
-    },
-    shaded: {
-      orientation: 'bottom' // top, bottom
-    }
-  };
+		  var options = {
+		    start: vis.moment().add(-60, 'seconds'), // changed so its faster
+		    end: vis.moment(),
+		    dataAxis: {
+		      left: {
+		        range: {
+					min:0, max: 100
+		        }
+		      }
+		    },
+		    drawPoints: {
+		      style: 'circle' // square, circle
+		    },
+		    shaded: {
+		      orientation: 'bottom' // top, bottom
+		    }
+		  };
   
-  var graph2d = new vis.Graph2d(container, dataset, options);
+		  var graph2d = new vis.Graph2d(container, dataset, options);
 
-  function renderStep() {
-    // move the window (you can think of different strategies).
-    var now = vis.moment();
-    var range = graph2d.getWindow();
-    var interval = range.end - range.start;
-    // move the window 90% to the left when now is larger than the end of the window
-    if (now > range.end) {
-       graph2d.setWindow(now - 0.1 * interval, now + 0.9 * interval);
-    }
-  }
+		  function renderStep() {
+		    // move the window (you can think of different strategies).
+		    var now = vis.moment();
+		    var range = graph2d.getWindow();
+		    var interval = range.end - range.start;
+		    // move the window 90% to the left when now is larger than the end of the window
+		    if (now > range.end) {
+		       graph2d.setWindow(now - 0.1 * interval, now + 0.9 * interval);
+		    }
+		  }
 
-// Fetch new data point and add it to the dataset
-$(document).ready(function() {
-	var last_id = "{{id}}";
-	var deveui = "{{deveui}}";
-	$.ajaxSetup({
-	  data: {csrfmiddlewaretoken: '{{ csrf_token }}' },
-	});
-  setInterval(function(){
-			$.ajax({
-        type: "POST",
-        url: "/displayTemperature/checkMessages/",
-				data: {"id" : last_id, "deveui" : deveui},
-				success: function(response){
-					var results = JSON.parse(response.results);
-					last_id = response.id;
-					highest = response.highest;
-					lowest = response.lowest;
-					average = response.last_avg;
-					// update html
-					$("#max").html(highest);
-					$("#avg").html(average);
-					$("#lwt").html(lowest);
-				    for(var i = 0; i < results.length; i++){
-				        	dataset.add({
-							  x: results[i].fields['rcv_date'],
-				          	  y: results[i].fields['average']
-				        	});
-				    }
-				}
+		// Fetch new data point and add it to the dataset
+		$(document).ready(function() {
+			var last_id = "{{id}}";
+			var deveui = "{{deveui}}";
+			$.ajaxSetup({
+			  data: {csrfmiddlewaretoken: '{{ csrf_token }}' },
 			});
-			renderStep();
-		}, 3000);
-		});	 
-</script>
+		  setInterval(function(){
+					$.ajax({
+		        type: "POST",
+		        url: "/displayTemperature/checkMessages/",
+						data: {"id" : last_id, "deveui" : deveui},
+						success: function(response){
+							var results = JSON.parse(response.results);
+							last_id = response.id;
+							highest = response.highest;
+							lowest = response.lowest;
+							average = response.last_avg;
+							// update html
+							$("#max").html(highest);
+							$("#avg").html(average);
+							$("#lwt").html(lowest);
+						    for(var i = 0; i < results.length; i++){
+						        	dataset.add({
+									  x: results[i].fields['rcv_date'],
+						          	  y: results[i].fields['average']
+						        	});
+						    }
+						}
+					});
+					renderStep();
+				}, 3000);
+				});	 
+		</script>
+{% endif %}
 {% endblock%}

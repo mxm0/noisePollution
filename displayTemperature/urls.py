@@ -11,6 +11,7 @@ urlpatterns = [
     url(r'^graph/(?P<deveui>.+)/$', views.graph, name='graph'),
     url(r'^deviceSearch/$', views.ajax_device_search, name = 'device_search' ),
     url(r'^editDevice/(?P<deveui>.+)/$', views.edit_device, name = 'edit_device' ),
+    url(r'^deleteDevice/(?P<deveui>.+)/$', views.delete_device, name = 'delete_device' ),
     url(r'^map/$', views.map, name='map'),
     url(r'^about/$', views.about, name='about'),
     url(r'^logout/$', auth_views.logout, name="logout", kwargs={'next_page': 'index'}),

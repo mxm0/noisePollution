@@ -9,7 +9,7 @@ from django.utils import timezone
 from datetime import datetime, timedelta
 from django.core import serializers
 import json
-from .forms import AddDeviceForm, EditDeviceForm, SearchDeviceForm
+from .forms import AddDeviceForm, EditDeviceForm, SearchDeviceForm, DeleteDeviceForm
 from googlemaps import Client
 from django.contrib.auth.decorators import login_required
 
@@ -47,10 +47,11 @@ def graph(request, deveui):
             'deveui' : deveui,
             'highest' : device[0].highest,
             'lowest' : device[0].lowest,
-            'average' : messages.reverse()[0].average
+            'average' : messages.reverse()[0].average,
+            'location' : device[0].address
         }
         return HttpResponse(template.render(context, request))
-    return HttpResponseBadRequest()
+    return render(request, 'displayTemperature/graph.html')
 
 def check_messages(request):
     # get all new data from a specific device
@@ -68,7 +69,7 @@ def check_messages(request):
         d['lowest'] =  device[0].lowest
         d['last_avg'] = messages.reverse()[0].average
         return JsonResponse(d)
-    return HttpResponseBadRequest()
+    return  HttpResponse(status=204)
 
 def list_device(request):
     devices = Device.objects.all()
@@ -120,13 +121,25 @@ def edit_device(request, deveui):
         address = request.POST.get('address')
         device = Device.objects.filter(dev_eui=deveui)
         if device.exists():
+            device.delete()
             api_key = "AIzaSyB0L99kRyFar3t6ecNlkyYeC7Ky14udF6o"
             gmaps = Client(api_key)
             geocode_result = gmaps.geocode(address)
             latitude = geocode_result[0]['geometry']['location']['lat']
             longitude = geocode_result[0]['geometry']['location']['lng']
-            Device.objects.filter(dev_eui=deveui).update(address=address, latitude=latitude, longitude=longitude)
+            device = Device(dev_eui=deveui, address=address, latitude=latitude, longitude=longitude)
+            device.save()
             return redirect('list_device')
     else:
         form = EditDeviceForm()
-        return render(request, 'displayTemperature/edit_device.html', {'form': form})
+        address = Device.objects.filter(dev_eui=deveui)[0].address
+        return render(request, 'displayTemperature/edit_device.html', {'form': form, 'address': address})
+        
+@login_required   
+def delete_device(request, deveui):
+    if request.method== 'POST':
+        Device.objects.filter(dev_eui=deveui).delete()
+        return redirect('list_device')
+    else:
+        form = DeleteDeviceForm()
+        return render(request, 'displayTemperature/delete_device.html', {'form': form, 'dev_eui': deveui})

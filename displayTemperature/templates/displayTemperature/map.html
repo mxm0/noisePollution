@@ -1,7 +1,28 @@
 {% extends 'displayTemperature/base.html' %}
-
+         
 {% block content %}
-    <div id="map"></div>
+	<div class="row">
+    	<div class="col-md-11" id="map"></div>
+		<div class="col-sm-1" id="color-legend"><table>
+			<tbody>
+			<tr><td style="background-color:#FF0000;width:180px;height:20px"><strong>140dB</strong></td></tr>
+			<tr><td style="background-color:#FF3000;width:80px;height:20px"><strong>130</strong></td></tr>
+			<tr><td style="background-color:#FF6000;width:80px;height:20px"><strong>120</strong></td></tr>
+			<tr><td style="background-color:#FF9100;width:80px;height:20px"><strong>110</strong></td></tr>
+			<tr><td style="background-color:#FFB500;width:80px;height:20px"><strong>100</strong></td></tr>
+			<tr><td style="background-color:#FFDA00;width:80px;height:20px"><strong>100</strong></td></tr>
+			<tr><td style="background-color:#FFFF00;width:80px;height:20px"><strong>90</strong></td></tr>
+			<tr><td style="background-color:#E9FF00;width:80px;height:20px"><strong>80</strong></td></tr>
+			<tr><td style="background-color:#D4FF00;width:80px;height:20px"><strong>70</strong></td></tr>
+			<tr><td style="background-color:#BFFF00;width:80px;height:20px"><strong>60</strong></td></tr>
+			<tr><td style="background-color:#AAFF00;width:80px;height:20px"><strong>50</strong></td></tr>
+			<tr><td style="background-color:#8CFF00;width:80px;height:20px"><strong>40</strong></td></tr>
+			<tr><td style="background-color:#6EFF00;width:80px;height:20px"><strong>30</strong></td></tr>
+			<tr><td style="background-color:#50FF00;width:80px;height:20px"><strong>20</strong></td></tr>
+			<tr><td style="background-color:#33FF00;width:80px;height:20px"><strong>10dB</strong></td></tr>
+			</tbody></table>
+		</div>
+	</div>
 {% endblock %}
 
 {% block extra_js %}
@@ -30,7 +51,7 @@
           map: map
         });
 		heatmap.set('radius', 30);
-		heatmap.set('maxIntensity', 120);
+		heatmap.set('maxIntensity', 140);
       }
 	  
     </script>

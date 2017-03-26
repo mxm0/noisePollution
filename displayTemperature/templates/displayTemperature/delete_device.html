@@ -1,9 +1,9 @@
 {% extends 'displayTemperature/base.html' %}
 
 {% block content %}
-	<h1>Edit Device Address</h1>
-	<p><strong>Old address: {{address}} </strong></p>
-	<p><strong>Editing the address of a device leads to the data collected so far to be removed.</strong></p>
+	<h1>Delete Device</h1>
+	<p><strong>Deleting a device it will remove every data related with it.</strong>
+	<strong>Type in Dev eui "{{ dev_eui }}" and submit to confim.</strong><p>
     <form method="POST" class="post-form" id="post-form">{% csrf_token %}
         {{ form.as_p }}
         <button type="submit" class="save btn btn-danger">Confirm</button>
