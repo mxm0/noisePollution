@@ -27,6 +27,7 @@ def map(request, id=None):
             tmp_data['latitude'] = device.latitude
             data[device.dev_eui] = tmp_data
         results = json.dumps(data)
+        print(results)
         return render(request, 'displayTemperature/map.html', {'data' : results})
     return render(request, 'displayTemperature/map.html')
     
@@ -51,7 +52,7 @@ def graph(request, deveui):
             'location' : device[0].address
         }
         return HttpResponse(template.render(context, request))
-    return render(request, 'displayTemperature/graph.html')
+    return render(request, 'displayTemperature/graph.html', {'deveui':deveui})
 
 def check_messages(request):
     # get all new data from a specific device

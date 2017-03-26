@@ -1,7 +1,7 @@
 {% extends 'displayTemperature/base.html' %}
 
 {% block content %}
-	{% if context %}
+	{% if messages %}
 		<div id="info" style="margin-bottom:20px">
 			<strong>Device: </strong>{{deveui}},  <strong>Location: </strong>{{location}}
 		</div>
@@ -10,12 +10,12 @@
 			<strong>Highest:  </strong> <p id="max" style="display:inline"></p>dB <strong>Average:  </strong> <p id="avg" style="display:inline"></p>dB <strong>Lowest:  </strong> <p id="lwt" style="display:inline"></p>dB
 		</div>
 	{% else %}
-		<strong> There is no data from this device. </strong>
+		<strong> There is no data from device {{ deveui }}. </strong>
 	{% endif %}
 {% endblock %}
 
 {% block extra_js %}
-	{% if context %}
+	{% if messages %}
 		<script type="text/javascript">
 		  var DELAY = 3000; // delay in ms to add new data points
 
