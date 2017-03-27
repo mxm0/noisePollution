@@ -28,14 +28,16 @@
 		  $("#max").html("{{highest}}");
 		  $("#avg").html("{{average}}");
 		  $("#lwt").html("{{lowest}}");
-
+		  
+		  // load data into the dataset for the graph
 		  for(var i = 0; i < messages.length; i++){
 		      	dataset.add({
 					x: messages[i].fields['rcv_date'],
 					y: messages[i].fields['average']
 		      	});
 		  }
-
+		  
+		  // set options of the graph
 		  var options = {
 		    start: vis.moment().add(-60, 'seconds'), // changed so its faster
 		    end: vis.moment(),

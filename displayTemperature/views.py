@@ -27,7 +27,6 @@ def map(request, id=None):
             tmp_data['latitude'] = device.latitude
             data[device.dev_eui] = tmp_data
         results = json.dumps(data)
-        print(results)
         return render(request, 'displayTemperature/map.html', {'data' : results})
     return render(request, 'displayTemperature/map.html')
     
@@ -61,7 +60,6 @@ def check_messages(request):
     device = Device.objects.filter(dev_eui=deveui)
     messages = Message.objects.filter(Q(id__gt = last_id) & Q(device=device)).order_by('rcv_date')
     if messages.exists():
-        print(messages.reverse()[0].average)
         data = serializers.serialize("json", messages, fields=('average', 'rcv_date'))
         d = {}
         d['results'] = data

@@ -21,6 +21,7 @@ class DisplaytemperatureConfig(AppConfig):
         def on_message(client, userdata, msg):
             response = json.loads(msg.payload)
             decoded_data = base64.b64decode(response['data']).decode("utf-8").split("-")
+            print("Message received")
             print(decoded_data)
             highest = decoded_data[0]
             average = decoded_data[1]
@@ -34,7 +35,6 @@ class DisplaytemperatureConfig(AppConfig):
                 device.lowest = lowest
                 device.save()
                 message.save()
-            print("decoded data: " + str(decoded_data))
             
         def on_log(mqttc, obj, level, string):
             print(string)
